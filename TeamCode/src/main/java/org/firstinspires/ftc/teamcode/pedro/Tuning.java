@@ -10,6 +10,10 @@ import org.firstinspires.ftc.teamcode.pedro.procedures.MecanumTuner;
 import org.firstinspires.ftc.teamcode.pedro.procedures.PinpointTuner;
 import org.firstinspires.ftc.teamcode.pedro.procedures.Tests;
 
+/*
+ * Each @Tuner method registers one procedure with the tuning library.
+ * Based on the Quickstart's own pre-release version (commit 20768b3), adapted to this robot.
+ */
 public class Tuning {
     @Tuner
     public static Procedure mecanumTuner() {
@@ -24,15 +28,15 @@ public class Tuning {
     @Tuner
     public static Procedure foresightTuner() {
         return new ForesightTuner(
-                h -> new PinpointLocalizer(h, Constants.localizerConfig),
-                h -> new Mecanum(h, Constants.drivetrainConfig));
+                hardwareMap -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig),
+                hardwareMap -> new Mecanum(hardwareMap, Constants.drivetrainConfig));
     }
 
     @Tuner
     public static Procedure tests() {
         return new Tests(
-                h -> new Mecanum(h, Constants.drivetrainConfig),
-                h -> new PinpointLocalizer(h, Constants.localizerConfig),
+                hardwareMap -> new Mecanum(hardwareMap, Constants.drivetrainConfig),
+                hardwareMap -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig),
                 () -> new Foresight(Constants.foresightConfig));
     }
 }
