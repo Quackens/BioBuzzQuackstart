@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -12,21 +13,22 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 public class Turret {
 
+    public double heading = 0.0;
     public boolean enabled = false;
     public boolean changed = false;
     public DcMotorEx hsM;
     public DcMotorEx lsM;
-    public DcMotorEx dM;
 
     private double velocity = 100.0;
 
+    public Servo headingServo;
     DcMotorControllerEx hsMController;
     DcMotorControllerEx lsMController;
 
     public Turret(HardwareMap hardwareMap) {
         hsM = hardwareMap.get(DcMotorEx.class, "hsM");
         lsM = hardwareMap.get(DcMotorEx.class, "lsM");
-        dM = hardwareMap.get(DcMotorEx.class, "dM");
+        headingServo = hardwareMap.get(Servo.class, "headingServo");
 
         hsM.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -34,9 +36,6 @@ public class Turret {
         lsMController = (DcMotorControllerEx)lsM.getController();
 
         lsM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        dM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        dM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void setVelocity(double v) {
@@ -54,11 +53,7 @@ public class Turret {
         enabled = false;
     }
 
-    public void update() {
-        if (!changed) {
-            return;
-        }
-        changed = false;
+    public void update(double robotHeading) {
         if (enabled) {
             hsM.setVelocity(velocity / 3.0, AngleUnit.DEGREES);
             lsM.setVelocity(velocity, AngleUnit.DEGREES);
@@ -67,6 +62,12 @@ public class Turret {
             hsM.setVelocity(0, AngleUnit.DEGREES);
             lsM.setVelocity(0, AngleUnit.DEGREES);
         }
+        headingServo.setPosition(0.0);
+    }
+
+    public void setHeading(double heading) {
+        this.heading = heading;
+
     }
 
     public void debug(Telemetry telemetry) {
