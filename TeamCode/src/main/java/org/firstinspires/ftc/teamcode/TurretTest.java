@@ -41,6 +41,8 @@ public class TurretTest extends OpMode {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         double v = velocity;
 
+        turret.setHeading(gamepad1.right_stick_x);
+
         if (gamepad1.dpadUpWasPressed()) {
             velocity += 1.0;
         }

@@ -62,7 +62,7 @@ public class Turret {
             hsM.setVelocity(0, AngleUnit.DEGREES);
             lsM.setVelocity(0, AngleUnit.DEGREES);
         }
-        headingServo.setPosition(0.0);
+        headingServo.setPosition((this.heading + 1.0) / 2.0);
     }
 
     public void setHeading(double heading) {

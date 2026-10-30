@@ -15,8 +15,11 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.revhub.localizers.CustomIMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import static com.pedropathing.follower.Follower.Mode.FOLLOW;
+import static com.pedropathing.follower.Follower.Mode.IDLE;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
@@ -37,7 +40,10 @@ public class ExampleAuto extends OpMode {
     private CustomIMU imu;
     private Follower follower;
     private final PoseFactory p = PoseFactory.degrees();
-    private Servo turretServo;
+    public Turret turret;
+    public double velocity = 200;
+    LED redLED;
+    LED greenLED;
 
     // Poses!
     private final Pose endPose = p.of(138, 138, 0);
@@ -50,11 +56,10 @@ public class ExampleAuto extends OpMode {
 
     @Override
     public void init() {
-
+        greenLED = hardwareMap.get(LED.class, "front_led_green");
+        redLED = hardwareMap.get(LED.class, "front_led_red");
+        turret = new Turret(hardwareMap);
         curvePath = Paths.through(startPose, controlOne, controlTwo, endPose).tangent();
-
-        turretServo = hardwareMap.get(Servo.class, "turret");
-        turretServo.setPosition(0);
 
         joinedTelemetry = new JoinedTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(), telemetry);
 
@@ -62,11 +67,18 @@ public class ExampleAuto extends OpMode {
 
         follower = Constants.create(hardwareMap);
         follower.setPose(startPose);
+
+        if (gamepad1.dpadUpWasPressed()) {
+            driveMode = DriveMode.Field;
+            manualEnabled = true;
+        } else if (gamepad1.dpadDownWasPressed()) {
+            driveMode = DriveMode.Robot;
+            manualEnabled = true;
+        }
     }
 
     @Override
     public void start() {
-        //follower.follow(curvePath);
         follower.update();
         savedPose = follower.localizer.pose();
     }
@@ -87,24 +99,46 @@ public class ExampleAuto extends OpMode {
             manualEnabled = true;
             follower.update();
         }
+        if (gamepad1.xWasPressed()) {
+            if (turret.enabled) {
+                turret.disable();
+            }
+            else {
+                turret.enable();
+            }
+        }
+        if (gamepad1.bWasPressed()) {
+            follower.follow(curvePath);
+            follower.update();
+        }
 
         if (gamepad1.rightTriggerWasPressed()) {
-            turretServo.setPosition(1);
+
         }
         else if (gamepad1.leftTriggerWasPressed()) {
-            turretServo.setPosition(-1);
+
+        }
+
+        if (gamepad1.dpadUpWasPressed()) {
+            velocity += 10.0;
+            turret.setVelocity(velocity);
+        }
+        else if (gamepad1.dpadDownWasPressed()) {
+            velocity -= 10.0;
+            turret.setVelocity(velocity);
         }
 
         if (gamepad1.rightBumperWasPressed()) {
             manualEnabled = true;
         }
 
-        if (gamepad1.dpadUpWasPressed()) {
-            driveMode = DriveMode.Field;
-            manualEnabled = true;
-        } else if (gamepad1.dpadDownWasPressed()) {
-            driveMode = DriveMode.Robot;
-            manualEnabled = true;
+        if (follower.mode() == FOLLOW) {
+            redLED.on();
+            greenLED.on();
+        }
+        else if (follower.mode() == IDLE) {
+            redLED.off();
+            greenLED.off();
         }
 
         if (manualEnabled) {
@@ -132,10 +166,11 @@ public class ExampleAuto extends OpMode {
 
             }
             else {
-                follower.hold(savedPose);
+                //follower.hold(savedPose);
             }
         }
-
+        turret.setHeading(gamepad2.right_stick_x);
+        turret.update(0);
         joinedTelemetry.addData("Drive Mode", driveMode);
         joinedTelemetry.update();
         Scheduler.execute();
