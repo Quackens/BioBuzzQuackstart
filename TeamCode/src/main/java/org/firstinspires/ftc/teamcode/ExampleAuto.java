@@ -74,6 +74,7 @@ public class ExampleAuto extends OpMode {
         //redLED = hardwareMap.get(LED.class, "front_led_red");
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeCtl = (DcMotorControllerEx)intakeMotor.getController();
 
 
         slideServo = hardwareMap.get(Servo.class, "slide");
@@ -208,7 +209,7 @@ public class ExampleAuto extends OpMode {
 //                //follower.hold(savedPose);
 //            }
         }
-        telemetry.addData("intake mA", intakeCtl.getMotorCurrent(0, CurrentUnit.MILLIAMPS));
+        telemetry.addData("intake mA", intakeCtl.getMotorCurrent(2, CurrentUnit.MILLIAMPS));
         turret.setHeading(gamepad2.right_stick_x);
         turret.update(0);
         turret.debug(telemetry);
