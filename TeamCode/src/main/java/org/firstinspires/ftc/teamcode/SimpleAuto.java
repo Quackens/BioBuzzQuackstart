@@ -46,24 +46,23 @@ public class SimpleAuto extends OpMode {
     private DcMotorControllerEx intakeCtl;
 
     // Poses!
-    private final Pose endPose = p.of(0, 6, 0);
-    private final Pose controlOne = p.of(72, 48, 45);
-    private final Pose controlTwo = p.of(72, 96, 45);
-    private final Pose startPose = p.of(0, 0, 0);
+    private final Pose endPose = p.of(0, 6, 90);
+    private final Pose ctrl1 = p.of(10, 6, 90);
+    private final Pose startPose = p.of(20, 0, 90);
 
     // Paths!
     private Path move;
+    private Path curve;
 
     @Override
     public void init() {
-        //greenLED = hardwareMap.get(LED.class, "front_led_green");
-        //redLED = hardwareMap.get(LED.class, "front_led_red");
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeCtl = (DcMotorControllerEx)intakeMotor.getController();
 
         turret = new Turret(hardwareMap);
         move = Paths.line(startPose, endPose).linear(startPose, endPose);
+        curve = Paths.through(startPose, ctrl1, endPose).tangent();
 
         joinedTelemetry = new JoinedTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(), telemetry);
 
@@ -76,7 +75,7 @@ public class SimpleAuto extends OpMode {
     @Override
     public void start() {
         follower.update();
-        follower.follow(move);
+        follower.follow(curve);
     }
 
     @Override

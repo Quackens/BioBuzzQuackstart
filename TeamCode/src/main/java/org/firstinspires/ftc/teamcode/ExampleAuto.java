@@ -134,11 +134,11 @@ public class ExampleAuto extends OpMode {
         }
 
         if (gamepad2.rightBumperWasPressed()) {
-            intakePower = 0.8;
+            intakePower = 1.0;
             intakeMotor.setPower(intakePower);
         }
         else if (gamepad2.leftBumperWasPressed()) {
-            intakePower = -0.2;
+            intakePower = -1.0;
             intakeMotor.setPower(intakePower);
         }
 
