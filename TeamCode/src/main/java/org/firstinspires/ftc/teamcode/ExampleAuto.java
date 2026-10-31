@@ -56,7 +56,7 @@ public class ExampleAuto extends OpMode {
     LED redLED;
     LED greenLED;
 
-    private double Polin = 0.0;
+    private double Pollen = 0.0;
     private double Nectar = 1.0;
 
     // Poses!
@@ -134,7 +134,7 @@ public class ExampleAuto extends OpMode {
         }
 
         if (gamepad2.rightBumperWasPressed()) {
-            intakePower = 1.0;
+            intakePower = 0.8;
             intakeMotor.setPower(intakePower);
         }
         else if (gamepad2.leftBumperWasPressed()) {
@@ -143,8 +143,8 @@ public class ExampleAuto extends OpMode {
         }
 
         if (gamepad2.yWasPressed()) {
-            // polin
-            //slideServo.setPosition(Polin);
+            // pollen
+            //slideServo.setPosition(Pollen);
         }
         else if (gamepad2.xWasPressed()) {
             // nectar
