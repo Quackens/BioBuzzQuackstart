@@ -28,7 +28,7 @@ public class Turret {
     public Turret(HardwareMap hardwareMap) {
         hsM = hardwareMap.get(DcMotorEx.class, "hsM");
         lsM = hardwareMap.get(DcMotorEx.class, "lsM");
-        headingServo = hardwareMap.get(Servo.class, "headingServo");
+        headingServo = hardwareMap.get(Servo.class, "turret");
 
         hsM.setDirection(DcMotorSimple.Direction.REVERSE);
 

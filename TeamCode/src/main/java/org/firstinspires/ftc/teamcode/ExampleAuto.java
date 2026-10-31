@@ -15,6 +15,9 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.revhub.localizers.CustomIMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -25,7 +28,7 @@ import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
-@Autonomous
+@TeleOp
 public class ExampleAuto extends OpMode {
 
     enum DriveMode {
@@ -42,8 +45,14 @@ public class ExampleAuto extends OpMode {
     private final PoseFactory p = PoseFactory.degrees();
     public Turret turret;
     public double velocity = 200;
+    private DcMotor intakeMotor;
+    private double intakePower = 1.0;
+    private Servo slideServo;
     LED redLED;
     LED greenLED;
+
+    private double Polin = 0.0;
+    private double Nectar = 1.0;
 
     // Poses!
     private final Pose endPose = p.of(138, 138, 0);
@@ -56,8 +65,13 @@ public class ExampleAuto extends OpMode {
 
     @Override
     public void init() {
-        greenLED = hardwareMap.get(LED.class, "front_led_green");
-        redLED = hardwareMap.get(LED.class, "front_led_red");
+        //greenLED = hardwareMap.get(LED.class, "front_led_green");
+        //redLED = hardwareMap.get(LED.class, "front_led_red");
+        intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        slideServo = hardwareMap.get(Servo.class, "slide");
+
         turret = new Turret(hardwareMap);
         curvePath = Paths.through(startPose, controlOne, controlTwo, endPose).tangent();
 
@@ -81,6 +95,11 @@ public class ExampleAuto extends OpMode {
     public void start() {
         follower.update();
         savedPose = follower.localizer.pose();
+
+        turret.enable();
+        intakeMotor.setPower(0.85);
+
+        slideServo.setPosition(0.0);
     }
 
     @Override
@@ -92,25 +111,43 @@ public class ExampleAuto extends OpMode {
         //joinedTelemetry.addData("A Was Pressed", gamepad1.a);
         //joinedTelemetry.addData("Manual Enabled?", manualEnabled);
 
-        if (gamepad1.yWasPressed()) {
-            follower.setPose(new Pose (0, 0, 90));
+//        if (gamepad1.yWasPressed()) {
+//            follower.setPose(new Pose (0, 0, 90));
+//        }
+//        if (gamepad1.aWasPressed()) {
+//            manualEnabled = true;
+//            follower.update();
+//        }
+
+        if (gamepad2.rightTriggerWasPressed()) {
+            turret.enable();
         }
-        if (gamepad1.aWasPressed()) {
-            manualEnabled = true;
-            follower.update();
+        else if (gamepad2.leftTriggerWasPressed()) {
+            turret.disable();
         }
-        if (gamepad1.xWasPressed()) {
-            if (turret.enabled) {
-                turret.disable();
-            }
-            else {
-                turret.enable();
-            }
+
+        if (gamepad2.rightBumperWasPressed()) {
+            intakePower = 1.0;
+            intakeMotor.setPower(intakePower);
         }
-        if (gamepad1.bWasPressed()) {
-            follower.follow(curvePath);
-            follower.update();
+        else if (gamepad2.leftBumperWasPressed()) {
+            intakePower = -1.0;
+            intakeMotor.setPower(intakePower);
         }
+
+        if (gamepad2.yWasPressed()) {
+            // polin
+            slideServo.setPosition(Polin);
+        }
+        else if (gamepad2.xWasPressed()) {
+            // nectar
+            slideServo.setPosition(Nectar);
+        }
+
+//        if (gamepad1.bWasPressed()) {
+//            follower.follow(curvePath);
+//            follower.update();
+//        }
 
         if (gamepad1.rightTriggerWasPressed()) {
 
@@ -119,26 +156,22 @@ public class ExampleAuto extends OpMode {
 
         }
 
-        if (gamepad1.dpadUpWasPressed()) {
+        if (gamepad2.dpadUpWasPressed()) {
             velocity += 10.0;
             turret.setVelocity(velocity);
         }
-        else if (gamepad1.dpadDownWasPressed()) {
+        else if (gamepad2.dpadDownWasPressed()) {
             velocity -= 10.0;
             turret.setVelocity(velocity);
         }
 
-        if (gamepad1.rightBumperWasPressed()) {
-            manualEnabled = true;
-        }
-
         if (follower.mode() == FOLLOW) {
-            redLED.on();
-            greenLED.on();
+            //redLED.on();
+            //greenLED.on();
         }
         else if (follower.mode() == IDLE) {
-            redLED.off();
-            greenLED.off();
+            //redLED.off();
+            //greenLED.off();
         }
 
         if (manualEnabled) {
@@ -171,6 +204,7 @@ public class ExampleAuto extends OpMode {
         }
         turret.setHeading(gamepad2.right_stick_x);
         turret.update(0);
+        turret.debug(telemetry);
         joinedTelemetry.addData("Drive Mode", driveMode);
         joinedTelemetry.update();
         Scheduler.execute();
