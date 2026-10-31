@@ -17,6 +17,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -26,6 +28,8 @@ import static com.pedropathing.follower.Follower.Mode.IDLE;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
+
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 @TeleOp
@@ -45,8 +49,9 @@ public class ExampleAuto extends OpMode {
     private final PoseFactory p = PoseFactory.degrees();
     public Turret turret;
     public double velocity = 200;
-    private DcMotor intakeMotor;
+    private DcMotorEx intakeMotor;
     private double intakePower = 1.0;
+    private DcMotorControllerEx intakeCtl;
     private Servo slideServo;
     LED redLED;
     LED greenLED;
@@ -67,8 +72,9 @@ public class ExampleAuto extends OpMode {
     public void init() {
         //greenLED = hardwareMap.get(LED.class, "front_led_green");
         //redLED = hardwareMap.get(LED.class, "front_led_red");
-        intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         slideServo = hardwareMap.get(Servo.class, "slide");
 
@@ -131,17 +137,17 @@ public class ExampleAuto extends OpMode {
             intakeMotor.setPower(intakePower);
         }
         else if (gamepad2.leftBumperWasPressed()) {
-            intakePower = -1.0;
+            intakePower = -0.2;
             intakeMotor.setPower(intakePower);
         }
 
         if (gamepad2.yWasPressed()) {
             // polin
-            slideServo.setPosition(Polin);
+            //slideServo.setPosition(Polin);
         }
         else if (gamepad2.xWasPressed()) {
             // nectar
-            slideServo.setPosition(Nectar);
+            //slideServo.setPosition(Nectar);
         }
 
 //        if (gamepad1.bWasPressed()) {
@@ -202,6 +208,7 @@ public class ExampleAuto extends OpMode {
 //                //follower.hold(savedPose);
 //            }
         }
+        telemetry.addData("intake mA", intakeCtl.getMotorCurrent(0, CurrentUnit.MILLIAMPS));
         turret.setHeading(gamepad2.right_stick_x);
         turret.update(0);
         turret.debug(telemetry);
