@@ -175,9 +175,9 @@ public class ExampleAuto extends OpMode {
         }
 
         if (manualEnabled) {
-            if (gamepad1.left_stick_x > 0.01 || gamepad1.left_stick_x < -0.01
-                || gamepad1.left_stick_y > 0.01 || gamepad1.left_stick_y < -0.01
-                || gamepad1.right_stick_x > 0.01 || gamepad1.right_stick_x < -0.01)
+//            if (gamepad1.left_stick_x > 0.01 || gamepad1.left_stick_x < -0.01
+//                || gamepad1.left_stick_y > 0.01 || gamepad1.left_stick_y < -0.01
+//                || gamepad1.right_stick_x > 0.01 || gamepad1.right_stick_x < -0.01)
             {
                 if (driveMode == DriveMode.Robot) {
                     follower.manual(
@@ -198,9 +198,9 @@ public class ExampleAuto extends OpMode {
                 savedPose = follower.localizer.pose();
 
             }
-            else {
-                //follower.hold(savedPose);
-            }
+//            else {
+//                //follower.hold(savedPose);
+//            }
         }
         turret.setHeading(gamepad2.right_stick_x);
         turret.update(0);

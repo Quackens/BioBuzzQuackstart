@@ -19,7 +19,7 @@ public class Turret {
     public DcMotorEx hsM;
     public DcMotorEx lsM;
 
-    private double velocity = 100.0;
+    private double velocity = 150.0;
 
     public Servo headingServo;
     DcMotorControllerEx hsMController;
@@ -84,5 +84,6 @@ public class Turret {
 
         telemetry.addData("hsM RPM", (hsM.getVelocity() / 28.0) * 60.0);
         telemetry.addData("lsM RPM", (lsM.getVelocity() / 28.0) * 60.0);
+        telemetry.addData("lsM velocity", velocity);
     }
 }
