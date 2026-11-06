@@ -47,9 +47,9 @@ public class Constants {
         c.name.set("odo");
         c.podType.set(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
         c.xPodOffset.set(-5.2550320362481555);
-        c.yPodOffset.set(-6.496516550619771);  // sign flipped by hand: tuner gave +6.4965, but the strafe pod is measured ~6.5 in BEHIND center
+        c.yPodOffset.set(6.496516550619771);  // sign flipped by hand: tuner gave +6.4965, but the strafe pod is measured ~6.5 in BEHIND center
         c.xPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);
-        c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.REVERSED);  // flipped by hand: Pose Test read y = -32 for a push LEFT (tuner said FORWARD)
+        c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);  // flipped by hand: Pose Test read y = -32 for a push LEFT (tuner said FORWARD) UPDATE: I think it was right to begin with
         c.globalDistanceUnit.set(DistanceUnit.INCH);
         c.offsetUnits.set(DistanceUnit.INCH);
     });
