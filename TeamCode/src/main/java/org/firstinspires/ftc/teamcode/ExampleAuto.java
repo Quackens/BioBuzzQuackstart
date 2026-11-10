@@ -211,7 +211,7 @@ public class ExampleAuto extends OpMode {
         }
         telemetry.addData("intake mA", intakeCtl.getMotorCurrent(2, CurrentUnit.MILLIAMPS));
         turret.setHeading(gamepad2.right_stick_x);
-        turret.update(0);
+        turret.update();
         turret.debug(telemetry);
         joinedTelemetry.addData("Drive Mode", driveMode);
         joinedTelemetry.update();

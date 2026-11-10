@@ -78,7 +78,6 @@ public class SimpleAuto extends OpMode {
         follower.update();
         follower.follow(startToScore);
         follower.follow(scoreToPark);
-        follower.update();
     }
 
     @Override

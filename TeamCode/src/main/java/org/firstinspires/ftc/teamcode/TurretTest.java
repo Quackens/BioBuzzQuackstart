@@ -73,7 +73,7 @@ public class TurretTest extends OpMode {
 
         //dM.setPower(-gamepad1.left_stick_x * 0.4);
 
-        turret.update(orientation.getYaw(AngleUnit.DEGREES));
+        turret.update();
         turret.debug(telemetry);
         telemetry.addData("velocity", velocity);
     }

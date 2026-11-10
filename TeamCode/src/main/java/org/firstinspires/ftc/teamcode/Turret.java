@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.Rev9AxisImu;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -21,11 +22,13 @@ public class Turret {
 
     private double velocity = 150.0;
 
+    private Rev9AxisImu turretImu;
     public Servo headingServo;
     DcMotorControllerEx hsMController;
     DcMotorControllerEx lsMController;
 
     public Turret(HardwareMap hardwareMap) {
+        turretImu = hardwareMap.get(Rev9AxisImu.class, "imu");
         hsM = hardwareMap.get(DcMotorEx.class, "hsM");
         lsM = hardwareMap.get(DcMotorEx.class, "lsM");
         headingServo = hardwareMap.get(Servo.class, "turret");
@@ -36,6 +39,8 @@ public class Turret {
         lsMController = (DcMotorControllerEx)lsM.getController();
 
         lsM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        double heading = turretImu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 
     public void setVelocity(double v) {
@@ -53,7 +58,7 @@ public class Turret {
         enabled = false;
     }
 
-    public void update(double robotHeading) {
+    public void update() {
         if (enabled) {
             hsM.setVelocity(velocity / 3.0, AngleUnit.DEGREES);
             lsM.setVelocity(velocity, AngleUnit.DEGREES);
@@ -67,7 +72,6 @@ public class Turret {
 
     public void setHeading(double heading) {
         this.heading = heading;
-
     }
 
     public void debug(Telemetry telemetry) {
