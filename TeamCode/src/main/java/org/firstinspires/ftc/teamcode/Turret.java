@@ -17,28 +17,32 @@ public class Turret {
     public double heading = 0.0;
     public boolean enabled = false;
     public boolean changed = false;
-    public DcMotorEx hsM;
-    public DcMotorEx lsM;
+//    public DcMotorEx hsM;
+//    public DcMotorEx lsM;
 
+    public double yaw = 0.0;
+    public double servoPos = 0.5;
     private double velocity = 150.0;
+    private double targetHeading = 90.0;
+    public double error = 0.0;
 
-    private Rev9AxisImu turretImu;
+    private final Rev9AxisImu turretImu;
     public Servo headingServo;
     DcMotorControllerEx hsMController;
     DcMotorControllerEx lsMController;
 
     public Turret(HardwareMap hardwareMap) {
         turretImu = hardwareMap.get(Rev9AxisImu.class, "imu");
-        hsM = hardwareMap.get(DcMotorEx.class, "hsM");
-        lsM = hardwareMap.get(DcMotorEx.class, "lsM");
+//        hsM = hardwareMap.get(DcMotorEx.class, "hsM");
+//        lsM = hardwareMap.get(DcMotorEx.class, "lsM");
         headingServo = hardwareMap.get(Servo.class, "turret");
 
-        hsM.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        hsMController = (DcMotorControllerEx)hsM.getController();
-        lsMController = (DcMotorControllerEx)lsM.getController();
-
-        lsM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        hsM.setDirection(DcMotorSimple.Direction.REVERSE);
+//
+//        hsMController = (DcMotorControllerEx)hsM.getController();
+//        lsMController = (DcMotorControllerEx)lsM.getController();
+//
+//        lsM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         double heading = turretImu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
@@ -60,14 +64,19 @@ public class Turret {
 
     public void update() {
         if (enabled) {
-            hsM.setVelocity(velocity / 3.0, AngleUnit.DEGREES);
-            lsM.setVelocity(velocity, AngleUnit.DEGREES);
+//            hsM.setVelocity(velocity / 3.0, AngleUnit.DEGREES);
+//            lsM.setVelocity(velocity, AngleUnit.DEGREES);
         }
         else {
-            hsM.setVelocity(0, AngleUnit.DEGREES);
-            lsM.setVelocity(0, AngleUnit.DEGREES);
+//            hsM.setVelocity(0, AngleUnit.DEGREES);
+//            lsM.setVelocity(0, AngleUnit.DEGREES);
         }
-        headingServo.setPosition((this.heading + 1.0) / 2.0);
+
+        yaw = turretImu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + 90.0;
+        error = targetHeading - yaw;
+//        servoPos = 1.0 / 180.0 * error;
+
+        headingServo.setPosition(servoPos);
     }
 
     public void setHeading(double heading) {
@@ -75,7 +84,7 @@ public class Turret {
     }
 
     public void debug(Telemetry telemetry) {
-        telemetry.addData("hsm power", hsM.getPower());
+//        telemetry.addData("hsm power", hsM.getPower());
         telemetry.addData("hsm pct", hsMController.getMotorPower(0) * 100.0);
         telemetry.addData("hsm mA", hsMController.getMotorCurrent(0, CurrentUnit.MILLIAMPS));
         //telemetry.addData("hsm mode", hsMController.getMotorMode(0));
@@ -86,8 +95,8 @@ public class Turret {
         //telemetry.addData("lsm mode", lsMController.getMotorMode(1));
         //telemetry.addData("lsm mode", lsMController.getMotorZeroPowerBehavior(1));
 
-        telemetry.addData("hsM RPM", (hsM.getVelocity() / 28.0) * 60.0);
-        telemetry.addData("lsM RPM", (lsM.getVelocity() / 28.0) * 60.0);
+//        telemetry.addData("hsM RPM", (hsM.getVelocity() / 28.0) * 60.0);
+//        telemetry.addData("lsM RPM", (lsM.getVelocity() / 28.0) * 60.0);
         telemetry.addData("lsM velocity", velocity);
     }
 }
