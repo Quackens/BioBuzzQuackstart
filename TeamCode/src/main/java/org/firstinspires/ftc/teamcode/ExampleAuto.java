@@ -200,7 +200,7 @@ public class ExampleAuto extends OpMode {
                             -gamepad1.right_stick_x,
                             follower.pose().heading()
                     );
-                    follower.manual(powers);
+                    follower.manual(powers); 
                 }
                 savedPose = follower.localizer.pose();
 
