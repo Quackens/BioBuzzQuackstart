@@ -32,7 +32,7 @@ import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
-@Autonomous
+@Autonomous(name="Use this Micah", preselectTeleOp = "Drive")
 public class SimpleAuto extends OpMode {
 
     private JoinedTelemetry joinedTelemetry;
