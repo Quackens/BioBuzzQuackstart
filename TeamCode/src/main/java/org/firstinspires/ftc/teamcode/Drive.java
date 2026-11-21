@@ -218,16 +218,16 @@ public class Drive extends OpMode {
         else if (gamepad1.leftTriggerWasPressed()) {
 
         }
-        /*
+
         if (gamepad2.dpadUpWasPressed()) {
             velocity += 10.0;
-            // turret.setVelocity(velocity);
+            turret.setVelocity(velocity);
         }
         else if (gamepad2.dpadDownWasPressed()) {
             velocity -= 10.0;
-            // turret.setVelocity(velocity);
+            turret.setVelocity(velocity);
         }
-        */
+
 
 
         if (follower.mode() == FOLLOW) {

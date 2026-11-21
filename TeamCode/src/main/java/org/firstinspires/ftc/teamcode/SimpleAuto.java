@@ -57,11 +57,11 @@ public class SimpleAuto extends OpMode {
 
     @Override
     public void init() {
-        intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
-        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        intakeCtl = (DcMotorControllerEx)intakeMotor.getController();
-
-        turret = new Turret(hardwareMap);
+//        intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
+//        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        intakeCtl = (DcMotorControllerEx)intakeMotor.getController();
+//
+//        turret = new Turret(hardwareMap);
         startToScore = Paths.line(startPose, shootPose).linear(startPose, shootPose);
         scoreToPark = Paths.through(shootPose, controlPose, endPose).tangent();
 
