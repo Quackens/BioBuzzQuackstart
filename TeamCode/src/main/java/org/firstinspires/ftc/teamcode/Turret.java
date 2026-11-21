@@ -20,31 +20,60 @@ public class Turret {
     public boolean enabled = false;
     public boolean changed = false;
 //    public DcMotorEx hsM;
-//    public DcMotorEx lsM;
-
+    public DcMotorEx lsM;
     public double yaw = 0.0;
     public double servoPos = 0.5;
     private double velocity = 150.0;
-    private double targetHeading = 90.0;
+    private double targetHeading = 0;
     public double error = 0.0;
+
+    public double slidePause = 0.5;
 
     private final Rev9AxisImu turretImu;
     public Servo headingServo;
+
+    public Servo slideServo;
+
+    public DcMotor kicker;
+    public DcMotorEx intake;
+
+    private boolean kick = false;
+
+    private final double IntakeForce = -1.0;
+    private final double OutakeForce = 0.6;
+
+    private double intakeForce = 0;
+
+    public final double KickForce = 0.5;
+
+    private final double NectarPose = 0.55;
+    private final double PollenPose = 0.35;
+
+    private double pollenV = 200.0;
+    private double nectarV = 300.0;
+
+    private final double PollenClose = 0.3 ;
     DcMotorControllerEx hsMController;
     DcMotorControllerEx lsMController;
 
     public Turret(HardwareMap hardwareMap) {
-        turretImu = hardwareMap.get(Rev9AxisImu.class, "imu");
+        turretImu = hardwareMap.get(Rev9AxisImu.class, "tIMU");
 //        hsM = hardwareMap.get(DcMotorEx.class, "hsM");
-//        lsM = hardwareMap.get(DcMotorEx.class, "lsM");
-        headingServo = hardwareMap.get(Servo.class, "turret");
+        lsM = hardwareMap.get(DcMotorEx.class, "lsM");
+        headingServo = hardwareMap.get(Servo.class, "turretR");
+        slideServo = hardwareMap.get(Servo.class, "slide");
+        kicker = hardwareMap.get(DcMotor.class, "kickM");
+        intake = hardwareMap.get(DcMotorEx.class, "iM");
 
 //        hsM.setDirection(DcMotorSimple.Direction.REVERSE);
 //
 //        hsMController = (DcMotorControllerEx)hsM.getController();
-//        lsMController = (DcMotorControllerEx)lsM.getController();
-//
-//        lsM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lsMController = (DcMotorControllerEx)lsM.getController();
+
+        //slideServo.setPosition(0.5);
+        slidePause = (PollenClose);
+
+        lsM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         double heading = turretImu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
@@ -64,21 +93,63 @@ public class Turret {
         enabled = false;
     }
 
+    public void setPollen(){
+        slidePause = PollenPose;
+        enabled = true;
+        velocity = pollenV;
+    }
+
+    public void setNectar(){
+        slidePause = NectarPose;
+        enabled = true;
+        velocity = nectarV;
+    }
+
+    public void enableKick(){
+        kick = true;
+    }
+
+    public void enableIntake(){
+        intakeForce = IntakeForce;
+    }
+
+    public void enableOutake(){
+        intakeForce = OutakeForce;
+    }
+
+    public void setClose(){
+        slidePause = (PollenClose);
+        velocity = 50;
+    }
+
     public void update() {
         if (enabled) {
 //            hsM.setVelocity(velocity / 3.0, AngleUnit.DEGREES);
-//            lsM.setVelocity(velocity, AngleUnit.DEGREES);
+            lsM.setVelocity(velocity, AngleUnit.DEGREES);
         }
         else {
 //            hsM.setVelocity(0, AngleUnit.DEGREES);
-//            lsM.setVelocity(0, AngleUnit.DEGREES);
+            lsM.setVelocity(0, AngleUnit.DEGREES);
         }
 
         yaw = turretImu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + 90.0;
         error = targetHeading - yaw;
-//        servoPos = 1.0 / 180.0 * error;
+        servoPos = 1.0 / 180.0 * (error * 0.1);
 
-        headingServo.setPosition(servoPos);
+        //headingServo.setPosition(servoPos);
+
+        slideServo.setPosition(slidePause); // Don't change unless needed
+
+        if (kick){
+            kicker.setPower(KickForce);
+            kick = false;
+        } else {
+            kicker.setPower(0);
+        }
+
+        intake.setPower(intakeForce);
+
+        intakeForce = 0.0;
     }
 
     public void setHeading(double heading) {
@@ -86,19 +157,26 @@ public class Turret {
     }
 
     public void debug(Telemetry telemetry) {
+
+        telemetry.addData("Error:", error);
+        telemetry.addData("Target Heading:", targetHeading);
+        telemetry.addData("Yaw:", yaw);
 //        telemetry.addData("hsm power", hsM.getPower());
-        telemetry.addData("hsm pct", hsMController.getMotorPower(0) * 100.0);
-        telemetry.addData("hsm mA", hsMController.getMotorCurrent(0, CurrentUnit.MILLIAMPS));
+        // telemetry.addData("hsm pct", hsMController.getMotorPower(0) * 100.0);
+        // telemetry.addData("hsm mA", hsMController.getMotorCurrent(0, CurrentUnit.MILLIAMPS));
         //telemetry.addData("hsm mode", hsMController.getMotorMode(0));
         //telemetry.addData("hsm mode", lsMController.getMotorZeroPowerBehavior(0));
 
         telemetry.addData("lsm pct", lsMController.getMotorPower(1) * 100.0);
-        telemetry.addData("lsm mA", lsMController.getMotorCurrent(1, CurrentUnit.MILLIAMPS));
+        telemetry.addData("lsm mA", lsMController.getMotorCurrent(0, CurrentUnit.MILLIAMPS));
         //telemetry.addData("lsm mode", lsMController.getMotorMode(1));
         //telemetry.addData("lsm mode", lsMController.getMotorZeroPowerBehavior(1));
 
 //        telemetry.addData("hsM RPM", (hsM.getVelocity() / 28.0) * 60.0);
-//        telemetry.addData("lsM RPM", (lsM.getVelocity() / 28.0) * 60.0);
+        telemetry.addData("lsM RPM", (lsM.getVelocity() / 28.0) * 60.0);
         telemetry.addData("lsM velocity", velocity);
+        telemetry.addData("slidePause", slidePause);
+
+
     }
 }

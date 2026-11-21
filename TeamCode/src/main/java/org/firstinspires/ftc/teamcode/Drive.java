@@ -29,6 +29,7 @@ import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Prism.Color;
 import org.firstinspires.ftc.teamcode.Prism.GoBildaPrismDriver;
@@ -79,6 +80,8 @@ public class Drive extends OpMode {
     private final Pose controlTwo = p.of(72, 96, 45);
     private final Pose startPose = p.of(0, 0, 90);
 
+    public int counter = 0;
+
     // Paths!
     private Path curvePath;
 
@@ -108,14 +111,13 @@ public class Drive extends OpMode {
 
         //greenLED = hardwareMap.get(LED.class, "front_led_green");
         //redLED = hardwareMap.get(LED.class, "front_led_red");
-        // intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         // intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         // intakeCtl = (DcMotorControllerEx)intakeMotor.getController();
 
 
         // slideServo = hardwareMap.get(Servo.class, "slide");
 
-        // turret = new Turret(hardwareMap);
+        turret = new Turret(hardwareMap);
         // curvePath = Paths.through(startPose, controlOne, controlTwo, endPose).tangent();
 
         joinedTelemetry = new JoinedTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(), telemetry);
@@ -162,30 +164,41 @@ public class Drive extends OpMode {
 //            follower.update();
 //        }
 
-        if (gamepad2.rightTriggerWasPressed()) {
+
+        if (gamepad2.right_trigger_pressed) {
             // turret.enable();
+            turret.enableKick();
         }
-        else if (gamepad2.leftTriggerWasPressed()) {
+        else if (gamepad2.left_trigger_pressed) {
             // turret.disable();
+            turret.enableIntake();
         }
 
-        if (gamepad2.rightBumperWasPressed()) {
+        if (gamepad2.right_bumper) {
             // intakePower = 1.0;
             // intakeMotor.setPower(intakePower);
         }
-        else if (gamepad2.leftBumperWasPressed()) {
+        else if (gamepad2.left_bumper) {
             // intakePower = -1.0;
             // intakeMotor.setPower(intakePower);
+            turret.enableOutake();
         }
 
         if (gamepad2.yWasPressed()) {
             // pollen
-            //slideServo.setPosition(Pollen);
+            turret.setPollen();
         }
         else if (gamepad2.xWasPressed()) {
             // nectar
-            //slideServo.setPosition(Nectar);
+            turret.setNectar();
         }
+
+        if (gamepad2.bWasPressed()){
+            // Close and slow down
+            turret.setClose();
+        }
+
+
 
 //        if (gamepad1.bWasPressed()) {
 //            follower.follow(curvePath);
@@ -198,7 +211,7 @@ public class Drive extends OpMode {
         else if (gamepad1.leftTriggerWasPressed()) {
 
         }
-
+        /*
         if (gamepad2.dpadUpWasPressed()) {
             velocity += 10.0;
             // turret.setVelocity(velocity);
@@ -207,6 +220,8 @@ public class Drive extends OpMode {
             velocity -= 10.0;
             // turret.setVelocity(velocity);
         }
+        */
+
 
         if (follower.mode() == FOLLOW) {
             //redLED.on();
@@ -256,16 +271,41 @@ public class Drive extends OpMode {
                         }
                         break;
                     case Holding:
-                        follower.hold(savedPose);
+                        //follower.hold(savedPose);
                         break;
                 }
             }
             telemetry.addData("HoldState", holdState);
         }
+
+
+
+        // Adjustments to the slide on turret
+
+        /*
+        if (gamepad2.dpadUpWasPressed()) {
+
+            turret.slidePause += 0.05;
+            counter += 1;
+
+
+        } else if (gamepad2.dpadDownWasPressed()) {
+
+            turret.slidePause -= 0.05;
+            counter -= 1;
+
+        }
+        */
+
+
+        telemetry.addData("Counter", counter);
+
         // telemetry.addData("intake mA", intakeCtl.getMotorCurrent(2, CurrentUnit.MILLIAMPS));
-        // turret.setHeading(gamepad2.right_stick_x);
-        // turret.update();
-        // turret.debug(telemetry);
+        turret.setHeading(Math.toDegrees(follower.localizer.pose().heading()));
+        // double heading = turretImu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        joinedTelemetry.addData("Heading", Math.toDegrees(follower.localizer.pose().heading()));
+        turret.update();
+        turret.debug(telemetry);
         joinedTelemetry.addData("Drive Mode", driveMode);
         joinedTelemetry.update();
         Scheduler.execute();
