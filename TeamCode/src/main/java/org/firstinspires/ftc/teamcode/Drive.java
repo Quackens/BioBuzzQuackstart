@@ -22,6 +22,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 import static com.pedropathing.follower.Follower.Mode.FOLLOW;
 import static com.pedropathing.follower.Follower.Mode.IDLE;
@@ -169,7 +170,7 @@ public class Drive extends OpMode {
             // turret.enable();
             turret.enableKick();
         }
-        else if (gamepad2.left_trigger_pressed) {
+        if (gamepad2.left_trigger_pressed) {
             // turret.disable();
             turret.enableIntake();
         }
@@ -178,7 +179,7 @@ public class Drive extends OpMode {
             // intakePower = 1.0;
             // intakeMotor.setPower(intakePower);
         }
-        else if (gamepad2.left_bumper) {
+        if (gamepad2.left_bumper) {
             // intakePower = -1.0;
             // intakeMotor.setPower(intakePower);
             turret.enableOutake();
@@ -198,7 +199,13 @@ public class Drive extends OpMode {
             turret.setClose();
         }
 
+        if (gamepad1.aWasPressed() || gamepad2.aWasPressed()){
+            // Align turret with robot "RESET"
+            turret.targetHeading = Math.toDegrees(follower.localizer.pose().heading());
+        }
 
+        turret.targetHeading += gamepad2.right_stick_x * 4.0;
+        turret.targetHeading = AngleUnit.normalizeDegrees(turret.targetHeading);
 
 //        if (gamepad1.bWasPressed()) {
 //            follower.follow(curvePath);
@@ -271,7 +278,7 @@ public class Drive extends OpMode {
                         }
                         break;
                     case Holding:
-                        //follower.hold(savedPose);
+                        follower.hold(savedPose);
                         break;
                 }
             }

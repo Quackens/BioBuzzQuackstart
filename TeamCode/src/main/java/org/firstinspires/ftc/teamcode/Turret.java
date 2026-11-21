@@ -24,7 +24,7 @@ public class Turret {
     public double yaw = 0.0;
     public double servoPos = 0.5;
     private double velocity = 150.0;
-    private double targetHeading = 0;
+    public double targetHeading = 90.0;
     public double error = 0.0;
 
     public double slidePause = 0.5;
@@ -44,13 +44,13 @@ public class Turret {
 
     private double intakeForce = 0;
 
-    public final double KickForce = 0.5;
+    public final double KickForce = 0.8;
 
     private final double NectarPose = 0.55;
     private final double PollenPose = 0.35;
 
-    private double pollenV = 200.0;
-    private double nectarV = 300.0;
+    private double pollenV = 250.0;
+    private double nectarV = 280.0;
 
     private final double PollenClose = 0.3 ;
     DcMotorControllerEx hsMController;
@@ -131,12 +131,15 @@ public class Turret {
 //            hsM.setVelocity(0, AngleUnit.DEGREES);
             lsM.setVelocity(0, AngleUnit.DEGREES);
         }
-
+        /*
         yaw = turretImu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + 90.0;
         error = targetHeading - yaw;
-        servoPos = 1.0 / 180.0 * (error * 0.1);
+        servoPos = (1.0 / 180.0) * (error * 0.1);
+         */
 
-        //headingServo.setPosition(servoPos);
+        servoPos = (1.0 / 180.0) * AngleUnit.normalizeDegrees(targetHeading - heading);
+
+        headingServo.setPosition((servoPos * 2.0 + 1.0) / 2.0);
 
         slideServo.setPosition(slidePause); // Don't change unless needed
 
@@ -158,9 +161,10 @@ public class Turret {
 
     public void debug(Telemetry telemetry) {
 
-        telemetry.addData("Error:", error);
+        //telemetry.addData("Error:", error);
         telemetry.addData("Target Heading:", targetHeading);
-        telemetry.addData("Yaw:", yaw);
+        telemetry.addData("Servo Pose", servoPos);
+        //telemetry.addData("Yaw:", yaw);
 //        telemetry.addData("hsm power", hsM.getPower());
         // telemetry.addData("hsm pct", hsMController.getMotorPower(0) * 100.0);
         // telemetry.addData("hsm mA", hsMController.getMotorCurrent(0, CurrentUnit.MILLIAMPS));
@@ -175,7 +179,7 @@ public class Turret {
 //        telemetry.addData("hsM RPM", (hsM.getVelocity() / 28.0) * 60.0);
         telemetry.addData("lsM RPM", (lsM.getVelocity() / 28.0) * 60.0);
         telemetry.addData("lsM velocity", velocity);
-        telemetry.addData("slidePause", slidePause);
+
 
 
     }
