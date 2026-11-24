@@ -60,6 +60,7 @@ public class Drive extends OpMode {
     private JoinedTelemetry joinedTelemetry;
     private CustomIMU imu;
     private Follower follower;
+    public double distanceToHive;
     private final PoseFactory p = PoseFactory.degrees();
     public Turret turret;
     public double velocity = 200;
@@ -67,8 +68,6 @@ public class Drive extends OpMode {
     private double intakePower = 1.0;
     private DcMotorControllerEx intakeCtl;
     private Servo slideServo;
-    LED redLED;
-    LED greenLED;
 
     GoBildaPrismDriver prism;
 
@@ -110,16 +109,7 @@ public class Drive extends OpMode {
         prism.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, solid);
         // prism.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_1,rainbowSnakes);
 
-        //greenLED = hardwareMap.get(LED.class, "front_led_green");
-        //redLED = hardwareMap.get(LED.class, "front_led_red");
-        // intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        // intakeCtl = (DcMotorControllerEx)intakeMotor.getController();
-
-
-        // slideServo = hardwareMap.get(Servo.class, "slide");
-
         turret = new Turret(hardwareMap);
-        // curvePath = Paths.through(startPose, controlOne, controlTwo, endPose).tangent();
 
         joinedTelemetry = new JoinedTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(), telemetry);
 
@@ -141,15 +131,12 @@ public class Drive extends OpMode {
     public void start() {
         follower.update();
         savedPose = follower.localizer.pose();
-
-        // turret.enable();
-        // intakeMotor.setPower(0.85);
-
-        // slideServo.setPosition(0.0);
     }
 
     @Override
     public void loop() {
+
+        distanceToHive = Math.hypot(58.75 - follower.localizer.pose().x(), follower.localizer.pose().y() - 50);
 
         if (gamepad2.right_trigger_pressed) {
             // turret.enable();
@@ -192,17 +179,12 @@ public class Drive extends OpMode {
         turret.targetHeading += gamepad2.right_stick_x * 4.0;
         turret.targetHeading = AngleUnit.normalizeDegrees(turret.targetHeading);
 
-//        if (gamepad1.bWasPressed()) {
-//            follower.follow(curvePath);
-//            follower.update();
-//        }
-
         if (gamepad2.dpadUpWasPressed()) {
-            velocity += 10.0;
+            velocity += 2.0;
             turret.setVelocity(velocity);
         }
         else if (gamepad2.dpadDownWasPressed()) {
-            velocity -= 10.0;
+            velocity -= 2.0;
             turret.setVelocity(velocity);
         }
 
@@ -269,6 +251,8 @@ public class Drive extends OpMode {
         joinedTelemetry.addData("y", follower.localizer.pose().y());
         joinedTelemetry.addData("Heading", Math.toDegrees(follower.localizer.pose().heading()));
         joinedTelemetry.addData("Drive Mode", driveMode);
+        joinedTelemetry.addData("Velocity", velocity);
+        joinedTelemetry.addData("Distance To Hive", distanceToHive);
         turret.update();
         turret.debug(telemetry);
         joinedTelemetry.update();

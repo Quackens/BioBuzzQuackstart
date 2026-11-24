@@ -64,7 +64,7 @@ public class SimpleAuto extends OpMode {
 //        intakeCtl = (DcMotorControllerEx)intakeMotor.getController();
 //
 //        turret = new Turret(hardwareMap);
-        movePath = Paths.curve(startPose, controlPose, endPose).tangent();
+        movePath = Paths.curve(startPose, shootPose, controlPose, endPose).tangent();
 
         joinedTelemetry = new JoinedTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(), telemetry);
 

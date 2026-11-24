@@ -34,6 +34,7 @@ public class Turret {
 
     public Servo slideServo;
 
+    public Drive driveVariables;
     public DcMotor kicker;
     public DcMotorEx intake;
 
@@ -151,6 +152,8 @@ public class Turret {
         }
 
         intake.setPower(intakeForce);
+
+//        setVelocity(driveVariables.distanceToHive);
 
         intakeForce = 0.0;
     }
