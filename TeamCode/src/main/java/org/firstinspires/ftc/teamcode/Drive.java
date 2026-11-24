@@ -151,21 +151,6 @@ public class Drive extends OpMode {
     @Override
     public void loop() {
 
-        //joinedTelemetry.addData("Heading", Math.toDegrees(follower.localizer.pose().heading()));
-        joinedTelemetry.addData("x", follower.localizer.pose().x());
-        joinedTelemetry.addData("y", follower.localizer.pose().y());
-        //joinedTelemetry.addData("A Was Pressed", gamepad1.a);
-        //joinedTelemetry.addData("Manual Enabled?", manualEnabled);
-
-//        if (gamepad1.yWasPressed()) {
-//            follower.setPose(new Pose (0, 0, 90));
-//        }
-//        if (gamepad1.aWasPressed()) {
-//            manualEnabled = true;
-//            follower.update();
-//        }
-
-
         if (gamepad2.right_trigger_pressed) {
             // turret.enable();
             turret.enableKick();
@@ -212,13 +197,6 @@ public class Drive extends OpMode {
 //            follower.update();
 //        }
 
-        if (gamepad1.rightTriggerWasPressed()) {
-
-        }
-        else if (gamepad1.leftTriggerWasPressed()) {
-
-        }
-
         if (gamepad2.dpadUpWasPressed()) {
             velocity += 10.0;
             turret.setVelocity(velocity);
@@ -246,8 +224,7 @@ public class Drive extends OpMode {
                         -gamepad1.left_stick_x,
                         -gamepad1.right_stick_x
                 );
-            }
-            else {
+            } else {
                 DrivePowers powers = ManualDrive.fieldCentric(
                         -gamepad1.left_stick_y,
                         -gamepad1.left_stick_x,
@@ -258,12 +235,10 @@ public class Drive extends OpMode {
             }
 
             if (gamepad1.left_stick_x > 0.01 || gamepad1.left_stick_x < -0.01
-                || gamepad1.left_stick_y > 0.01 || gamepad1.left_stick_y < -0.01
-                || gamepad1.right_stick_x > 0.01 || gamepad1.right_stick_x < -0.01)
-            {
+                    || gamepad1.left_stick_y > 0.01 || gamepad1.left_stick_y < -0.01
+                    || gamepad1.right_stick_x > 0.01 || gamepad1.right_stick_x < -0.01) {
                 holdState = HoldState.NoHold;
-            }
-            else {
+            } else {
                 // When there is no controller input, wait 250ms before saving the position, then
                 // begin holding position.
                 switch (holdState) {
@@ -285,35 +260,17 @@ public class Drive extends OpMode {
             telemetry.addData("HoldState", holdState);
         }
 
-
-
-        // Adjustments to the slide on turret
-
-        /*
-        if (gamepad2.dpadUpWasPressed()) {
-
-            turret.slidePause += 0.05;
-            counter += 1;
-
-
-        } else if (gamepad2.dpadDownWasPressed()) {
-
-            turret.slidePause -= 0.05;
-            counter -= 1;
-
-        }
-        */
-
-
         telemetry.addData("Counter", counter);
 
         // telemetry.addData("intake mA", intakeCtl.getMotorCurrent(2, CurrentUnit.MILLIAMPS));
         turret.setHeading(Math.toDegrees(follower.localizer.pose().heading()));
         // double heading = turretImu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        joinedTelemetry.addData("x", follower.localizer.pose().x());
+        joinedTelemetry.addData("y", follower.localizer.pose().y());
         joinedTelemetry.addData("Heading", Math.toDegrees(follower.localizer.pose().heading()));
+        joinedTelemetry.addData("Drive Mode", driveMode);
         turret.update();
         turret.debug(telemetry);
-        joinedTelemetry.addData("Drive Mode", driveMode);
         joinedTelemetry.update();
         Scheduler.execute();
         follower.update();
