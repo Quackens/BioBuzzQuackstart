@@ -4,9 +4,7 @@ import com.bylazar.telemetry.JoinedTelemetry;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.pedropathing.api.Paths;
 import com.pedropathing.api.PoseFactory;
-import com.pedropathing.drivetrain.DrivePowers;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
 import com.pedropathing.ivy.behaviors.EndCondition;
@@ -19,9 +17,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.LED;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import static com.pedropathing.follower.Follower.Mode.FOLLOW;
 import static com.pedropathing.follower.Follower.Mode.IDLE;
@@ -29,10 +24,9 @@ import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
-@Autonomous(name="Use this Micah", preselectTeleOp = "Drive")
+@Autonomous(name="Use this Drive Coach. Please! Otherwise it's not my fault, it's yours.", preselectTeleOp = "Drive")
 public class SimpleAuto extends OpMode {
 
     private JoinedTelemetry joinedTelemetry;
@@ -44,16 +38,24 @@ public class SimpleAuto extends OpMode {
     private DcMotorEx intakeMotor;
     private double intakePower = 1.0;
     private DcMotorControllerEx intakeCtl;
+    public static double xPos;
+    public static double yPos;
+    public static double robotHeading;
 
     // Poses!
     private final Pose startPose = p.of(58.75, 8.5, 90);
     private final Pose shootPose = p.of(58.75, 10, 90);
-    private final Pose controlPose = p.of(64, 120, 90);
-    private final Pose endPose = p.of(58.75, 14, 90);
+    private final Pose controlPose = p.of(15, 15, 90);
+    private final Pose endPose = p.of(10, 95, 90);
 
     // Paths!
     private Path movePath;
-    private Path scoreToPark;
+
+    public void updatePos() {
+        robotHeading = follower.localizer.pose().heading();
+        xPos = follower.localizer.pose().x();
+        yPos = follower.localizer.pose().y();
+    }
 
     @Override
     public void init() {
@@ -62,8 +64,7 @@ public class SimpleAuto extends OpMode {
 //        intakeCtl = (DcMotorControllerEx)intakeMotor.getController();
 //
 //        turret = new Turret(hardwareMap);
-        movePath = Paths.line(startPose, endPose).linear(startPose, endPose);
-        scoreToPark = Paths.through(shootPose, controlPose, endPose).tangent();
+        movePath = Paths.curve(startPose, controlPose, endPose).tangent();
 
         joinedTelemetry = new JoinedTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(), telemetry);
 
@@ -84,9 +85,11 @@ public class SimpleAuto extends OpMode {
 
         joinedTelemetry.addData("x", follower.localizer.pose().x());
         joinedTelemetry.addData("y", follower.localizer.pose().y());
+        joinedTelemetry.addData("Heading", follower.localizer.pose().heading());
 
         joinedTelemetry.update();
         Scheduler.execute();
         follower.update();
+        updatePos();
     }
 }

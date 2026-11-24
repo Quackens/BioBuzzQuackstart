@@ -79,7 +79,7 @@ public class Drive extends OpMode {
     private final Pose endPose = p.of(138, 138, 0);
     private final Pose controlOne = p.of(72, 48, 45);
     private final Pose controlTwo = p.of(72, 96, 45);
-    private final Pose startPose = p.of(0, 0, 90);
+    private final Pose startPose = p.of(SimpleAuto.xPos, SimpleAuto.yPos, SimpleAuto.robotHeading);
 
     public int counter = 0;
 
@@ -201,7 +201,7 @@ public class Drive extends OpMode {
 
         if (gamepad1.aWasPressed() || gamepad2.aWasPressed()){
             // Align turret with robot "RESET"
-            turret.targetHeading = Math.toDegrees(follower.localizer.pose().heading());
+            turret.targetHeading = Math.toDegrees(follower.localizer.pose().heading()) + 90;
         }
 
         turret.targetHeading += gamepad2.right_stick_x * 4.0;
